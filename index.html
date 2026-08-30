@@ -16,12 +16,12 @@
 <section id="list">
 <input id="search" class="search" placeholder="🔎 Rechercher une chanson ou un artiste..." oninput="filterSongs()">
 <div id="songs"></div>
-<div class="card" style="margin-top:14px;text-align:center">
-  <div style="font-weight:700;font-size:16px">🎵 Vous ne trouvez pas votre chanson ?</div>
-  <div class="tiny" style="margin:6px 0 10px">Demandez une autre chanson et nous la recevons directement.</div>
-  <input id="customSong" class="field" placeholder="Titre de la chanson">
-  <input id="customArtist" class="field" placeholder="Artiste (facultatif)">
-  <button class="send" style="background:#ffd21c;color:#111" onclick="requestCustomSong()">🎤 Demander cette chanson</button>
+<div class="card customRequest" style="margin-top:16px;text-align:left;border:2px solid #25d366;background:#171717;">
+  <div style="font-weight:800;font-size:19px;color:#fff">🎵 Vous ne trouvez pas votre chanson ?</div>
+  <div class="tiny" style="margin:7px 0 12px;color:#bbb">Entrez le titre ci-dessous et nous recevrons votre demande directement.</div>
+  <input id="customSong" class="field" placeholder="Titre de la chanson" autocomplete="off">
+  <input id="customArtist" class="field" placeholder="Artiste (facultatif)" autocomplete="off">
+  <button class="send" style="background:#25d366;color:#071108" onclick="requestCustomSong()">🎤 Demander cette chanson</button>
 </div>
 </section>
 
@@ -62,6 +62,7 @@ function choose(i){selected=songs[i];document.getElementById('selected').textCon
 function backToList(){document.getElementById('form').classList.add('hidden');document.getElementById('list').classList.remove('hidden');}
 function filterSongs(){const q=document.getElementById('search').value.toLowerCase();document.querySelectorAll('.song').forEach(b=>b.style.display=b.textContent.toLowerCase().includes(q)?'flex':'none');}
 function requestCustomSong(){const s=document.getElementById('customSong').value.trim();const a=document.getElementById('customArtist').value.trim();if(!s){showToast('⚠️ Indiquez le titre de la chanson');document.getElementById('customSong').focus();return;}selected=a?s+' — '+a:s;document.getElementById('selected').textContent='🎵 '+selected;document.getElementById('list').classList.add('hidden');document.getElementById('form').classList.remove('hidden');document.getElementById('name').focus();}
+function requestCustomSong(){const s=document.getElementById('customSong').value.trim();const a=document.getElementById('customArtist').value.trim();if(!s){showToast('🎵 Indiquez le titre de la chanson');document.getElementById('customSong').focus();return;}selected=a?s+' — '+a:s;document.getElementById('selected').textContent='🎤 '+selected;document.getElementById('list').classList.add('hidden');document.getElementById('form').classList.remove('hidden');document.getElementById('name').focus();}
 function post(data){const f=document.createElement('form');f.method='POST';f.action=API;f.target='apiFrame';Object.keys(data).forEach(k=>{const i=document.createElement('input');i.type='hidden';i.name=k;i.value=data[k];f.appendChild(i)});document.body.appendChild(f);f.submit();setTimeout(()=>f.remove(),1000);}
 function sendRequest(){const n=document.getElementById('name').value.trim()||'Client';const t=document.getElementById('table').value.trim();const parts=selected.split(' — ');post({action:'add',song:parts[0],artist:parts.slice(1).join(' — '),name:n,table:t});const msg='🎤 NOUVELLE DEMANDE\n\n🎵 '+selected+'\n👤 Client : '+n+(t?'\n🍽️ Table : '+t:'');window.open('https://wa.me/33759377927?text='+encodeURIComponent(msg),'_blank');document.getElementById('name').value='';document.getElementById('table').value='';document.getElementById('customSong').value='';document.getElementById('customArtist').value='';backToList();showToast('✅ Demande envoyée !');}
 function addManual(){const v=document.getElementById('manualSong').value.trim();if(!v)return;const p=v.split(' — ');post({action:'add',song:p[0],artist:p.slice(1).join(' — '),name:'Artiste',table:'',});document.getElementById('manualSong').value='';showToast('🎵 Ajouté à la file');setTimeout(loadQueue,800);}
