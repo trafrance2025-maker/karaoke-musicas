@@ -88,7 +88,14 @@ function updateRequestUI(){
   if(!closed&&b)b.remove();
 }
 function toggleRequests(){requestsOpen=!requestsOpen;localStorage.setItem('requestsOpen',requestsOpen?'1':'0');updateRequestUI();showToast(requestsOpen?'🟢 Demandes ouvertes !':'🔴 Demandes fermées !');}
-function post(data){fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data),mode:'no-cors'}).catch(()=>{});}
+function post(data){
+  const body=JSON.stringify(data);
+  try{
+    const blob=new Blob([body],{type:'text/plain;charset=utf-8'});
+    if(navigator.sendBeacon && navigator.sendBeacon(API,blob)) return;
+  }catch(e){}
+  fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body,mode:'no-cors',keepalive:true}).catch(()=>{});
+}
 function sendRequest(){if(!requestsOpen){showToast('🔒 Les demandes sont fermées pour le moment.');return;}const n=document.getElementById('name').value.trim()||'Client';const t=document.getElementById('table').value.trim();const parts=selected.split(' — ');post({action:'add',song:parts[0],artist:parts.slice(1).join(' — '),name:n,table:t});document.getElementById('name').value='';document.getElementById('table').value='';document.getElementById('customSong').value='';document.getElementById('customArtist').value='';backToList();showToast('✅ Demande envoyée ! Elle a été ajoutée à la file.');}
 function addManual(){const v=document.getElementById('manualSong').value.trim();if(!v)return;const p=v.split(' — ');post({action:'add',song:p[0],artist:p.slice(1).join(' — '),name:'Artiste',table:'',});document.getElementById('manualSong').value='';showToast('🎵 Ajouté à la file');setTimeout(loadQueue,800);}
 function gviz(query,cb){const name='cb_'+Date.now()+'_'+Math.random().toString(36).slice(2);window[name]=data=>{try{cb(data)}finally{delete window[name]}};const s=document.createElement('script');s.src='https://docs.google.com/spreadsheets/d/'+SHEET+'/gviz/tq?tqx=out:json;responseHandler:'+name+'&tq='+encodeURIComponent(query);s.onerror=()=>{delete window[name];document.getElementById('queue').innerHTML='<div class="empty">Impossible de charger la file.</div>'};document.body.appendChild(s);setTimeout(()=>s.remove(),7000);}
