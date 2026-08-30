@@ -35,7 +35,7 @@
 <div class="tiny">Votre demande sera ajoutée à la file de l'artiste.</div>
 </section>
 
-<div id="adminToggle" class="card" style="margin-top:18px;text-align:center;display:none">
+<div id="adminToggle" class="card" style="margin-top:18px;text-align:center;display:block">
   <div style="font-weight:800;font-size:18px">🎛️ Contrôle des demandes</div>
   <div class="tiny" style="margin:7px 0 12px">Activez ou désactivez les demandes WhatsApp des clients.</div>
   <button id="requestToggle" class="btn play" onclick="toggleRequests()">🟢 DEMANDES OUVERTES</button>
@@ -96,7 +96,7 @@ function enableSound(){soundOn=true;audioCtx=audioCtx||new (window.AudioContext|
 function beep(){if(!audioCtx)return;const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=880;g.gain.value=.08;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.16);}
 function showToast(t){const x=document.getElementById('toast');x.textContent=t;x.style.display='block';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>x.style.display='none',2200);}
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-renderSongs();if(isArtist){document.getElementById('list').classList.add('hidden');document.getElementById('artist').style.display='block';document.getElementById('adminToggle').style.display='block';loadQueue();setInterval(loadQueue,4000);}else{updateRequestUI();}
+renderSongs();if(isArtist){document.getElementById('list').classList.add('hidden');document.getElementById('artist').style.display='block';document.getElementById('adminToggle').style.display='block';loadQueue();setInterval(loadQueue,4000);}else{document.getElementById('adminToggle').style.display='none';updateRequestUI();}
 </script>
 </body>
 </html>
